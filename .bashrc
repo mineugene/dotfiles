@@ -36,6 +36,7 @@ eval "$(pyenv virtualenv-init -)"
 # [[ ALIASES ]]
 alias cp='rsync --info=progress2'
 alias df='df -hx tmpfs'
+alias dot='git --git-dir="$HOME/repos/dotfiles" --work-tree="$HOME"'
 alias sup='sudo pacman'
 alias supc='sup -Scc'
 alias supi='sup -S'
@@ -43,7 +44,6 @@ alias supr='sup -Rsn'
 alias supu='sup -Syu'
 alias supy='sup -Syy'
 alias vim='nvim'
-alias dot='git --git-dir="$HOME/repos/dotfiles" --work-tree="$HOME"'
 
 ls_format() {
     local default_args=(
@@ -76,23 +76,6 @@ ls_format() {
     fi
 }
 
-tree_format() {
-    local ignore_pattern="venv|__pycache__|node_modules|.git"
-    local flag_touch=0
-
-    which tree &>/dev/null
-    [ $? -eq 0 ] || echo "tree: command not found"
-
-    for i in "$@"; do
-        if [ -d "$i" ]; then
-            flag_touch=1
-            echo "$(pwd)/$i"; break
-        fi
-    done
-    if [ "$flag_touch" -ne 1 ]; then pwd; fi
-    tree --dirsfirst -I "$ignore_pattern" -L 2 "$@" | tail -n +2 | head -n -2
-}
-
 rm_confirm() {
     local opt_args=()
     local pos_args=()
@@ -114,6 +97,23 @@ rm_confirm() {
         2) rm "${opt_args[@]}" -i -- "${pos_args[@]}" ;;
         *) rm "${opt_args[@]}" -- "${pos_args[@]}" ;;
     esac
+}
+
+tree_format() {
+    local ignore_pattern="venv|__pycache__|node_modules|.git"
+    local flag_touch=0
+
+    which tree &>/dev/null
+    [ $? -eq 0 ] || echo "tree: command not found"
+
+    for i in "$@"; do
+        if [ -d "$i" ]; then
+            flag_touch=1
+            echo "$(pwd)/$i"; break
+        fi
+    done
+    if [ "$flag_touch" -ne 1 ]; then pwd; fi
+    tree --dirsfirst -I "$ignore_pattern" -L 2 "$@" | tail -n +2 | head -n -2
 }
 
 alias ls='ls_format'
