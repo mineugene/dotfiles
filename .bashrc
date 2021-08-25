@@ -80,9 +80,12 @@ ls_format() {
         /^[^dl]/ {print $0}
     '
     if [ $# -eq 0 ]; then
-        pwd &&
-        /usr/bin/ls "${default_args[@]}" | tail -fn +2 | awk "${list_pattern}"
-        return "$?"
+        pwd
+        if /usr/bin/ls "${default_args[@]}" | tail -fn +2 | awk "${list_pattern}"
+        then
+            return 0
+        fi
+        return 1
     fi
 
     for i in "$@"; do
