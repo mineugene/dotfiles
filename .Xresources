@@ -1,0 +1,66 @@
+URxvt.loginShell: true
+URxvt.background: rgba:E800/E900/EC00/CCCC
+URxvt.cursorBlink: true
+URxvt.depth: 32
+URxvt.font: xft:iosevka-ss16-heavy:pixelsize=20,xft:DejaVuSansMono:pixelsize=16
+URxvt.boldFont: xft:iosevka-ss16-extrabold:pixelsize=20
+URxvt.italicFont: xft:iosevka-ss16-heavy:style=Heavy Italic:pixelsize=20
+URxvt.boldItalicFont: xft:iosevka-ss16-extrabold:style=Extrabold Italic:pixelsize=20
+URxvt.letterSpace: 0
+URxvt.internalBorder: 22
+URxvt.secondaryScreen: 1
+URxvt.secondaryScroll: 0
+URxvt.secondaryWheel: 1
+URxvt.scrollBar: false
+URxvt.scrollTtyKeypress: true
+URxvt.scrollTtyOutput: false
+URxvt.scrollWithBuffer: false
+
+Xcursor.size: 16
+
+Xft.antialias: true
+Xft.autohint: false
+Xft.dpi: 92
+Xft.hinting: true
+Xft.hintstyle: hintslight
+Xft.rgba: none
+
+! color:special
+*.background:   #E8E9EC
+*.foreground:   #33374C
+*.cursorColor:  #33374C
+! color:black
+*.color0:       #DCDFE7
+*.color8:       #8389A3
+! color:red
+*.color1:       #CC517A
+*.color9:       #CC3768
+! color:green
+*.color2:       #668E3D
+*.color10:      #598030
+! color:yellow
+*.color3:       #C57339
+*.color11:      #B6662D
+! color:blue
+*.color4:       #2D539E
+*.color12:      #22478E
+! color:magenta
+*.color5:       #7759B4
+*.color13:      #6845AD
+! color:cyan
+*.color6:       #3f83a6
+*.color14:      #327698
+! color:white
+*.color7:       #33374c
+*.color15:      #262a3f
+
+! perl extensions
+URxvt.perl-lib: /usr/lib/urxvt/perl
+URxvt.perl-ext-common: default,keyboard-select,url-select
+! ext:url-select
+URxvt.keysym.M-u: perl:url-select:select_next
+URxvt.url-select.button: 1
+URxvt.url-select.launcher: /usr/bin/xdg-open
+URxvt.url-select.underline: true
+! ext:keyboard-select
+URxvt.keysym.M-Escape: perl:keyboard-select:activate
