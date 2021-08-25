@@ -114,7 +114,7 @@ tree_format() {
     local ignore_pattern="venv|__pycache__|node_modules|.git"
     local default_args=(
         "--dirsfirst"
-        "--filelimit" "16"
+        "--filelimit" "32"
         "-I" "\"$ignore_pattern\""
         "-L" "2"
     )
