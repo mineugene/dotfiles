@@ -45,6 +45,17 @@ alias supu='sup -Syu'
 alias supy='sup -Syy'
 alias vim='nvim'
 
+cd_format() {
+    local curr_dir="$(pwd)"
+    local next_dir=""
+    if [ "$#" -eq 0 ]; then echo "$curr_dir" && return 0; fi
+    for i in "$@"; do
+        if [ -d "$i" ]; then next_dir="$i" && break; fi
+    done
+    echo "$(realpath $next_dir) ◀ $curr_dir"
+    builtin cd "$@"
+}
+
 ls_format() {
     local default_args=(
         "-lXh"
@@ -116,6 +127,7 @@ tree_format() {
     tree --dirsfirst -I "$ignore_pattern" -L 2 "$@" | tail -n +2 | head -n -2
 }
 
+alias cd='cd_format'
 alias ls='ls_format'
 alias rm='rm_confirm'
 alias tree='tree_format'
