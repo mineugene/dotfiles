@@ -1,30 +1,25 @@
 #!/bin/sh
 
 rm_confirm() {
-    local opt_args pos_args
-    local flag_touch=0
+    declare opt_args=()
+    declare pos_args=()
+    declare -i flag_touch=0
 
-    # touching args
     for i in "$@"; do
-        if echo "$i" | grep -qe "^--\?[a-zA-Z]\+"
-        then
-            # option argument
+        if echo "$i" | grep -qe "^--\?[a-zA-Z]\+"; then
             opt_args+=("$i")
-            if echo "$i" | grep -qe "^-[a-zA-Z]*r"
-            then
-                # recursive flag received
+            if echo "$i" | grep -qe "^-[a-zA-Z]*r"; then
                 flag_touch=1
             fi
         else
-            # positional argument
             [ "$i" == "--" ] || pos_args+=("$i")
             if [ -h "$i" ]; then flag_touch=2; fi
         fi
     done
     case "$flag_touch" in
-        1) echo "rm" "${opt_args[@]}" "-I --" "${pos_args[@]}" ;;
-        2) echo "rm" "${opt_args[@]}" "-i --" "${pos_args[@]}" ;;
-        *) echo "rm" "${opt_args[@]}" "--" "${pos_args[@]}" ;;
+        1) echo "/usr/bin/rm" "${opt_args[@]}" "-I --" "${pos_args[@]}" ;;
+        2) echo "/usr/bin/rm" "${opt_args[@]}" "-i --" "${pos_args[@]}" ;;
+        *) echo "/usr/bin/rm" "${opt_args[@]}" "--" "${pos_args[@]}" ;;
     esac
 }
 
@@ -47,49 +42,49 @@ test_expect() {
 }
 
 test_plain_file() {
-    local expected="rm -- /tmp/test_file1"
+    local expected="/usr/bin/rm -- /tmp/test_file1"
     local received="$(rm_confirm /tmp/test_file1)"
     test_expect "$expected" "$received"
 }
 
 test_empty_dir () {
-    local expected="rm -d -- /tmp/test_dir1"
+    local expected="/usr/bin/rm -d -- /tmp/test_dir1"
     local received="$(rm_confirm -d /tmp/test_dir1)"
     test_expect "$expected" "$received"
 }
 
 test_mult_files() {
-    local expected="rm -- /tmp/test_file1 /tmp/test_file2 /tmp/test_file3"
+    local expected="/usr/bin/rm -- /tmp/test_file1 /tmp/test_file2 /tmp/test_file3"
     local received="$(rm_confirm /tmp/test_file1 /tmp/test_file2 /tmp/test_file3)"
     test_expect "$expected" "$received"
 }
 
 test_mult_dirs() {
-    local expected="rm -d -- /tmp/test_dir1 /tmp/test_dir2 /tmp/test_dir3"
+    local expected="/usr/bin/rm -d -- /tmp/test_dir1 /tmp/test_dir2 /tmp/test_dir3"
     local received="$(rm_confirm -d /tmp/test_dir1 /tmp/test_dir2 /tmp/test_dir3)"
     test_expect "$expected" "$received"
 }
 
 test_recurive_opt() {
-    local expected="rm -r -I -- /tmp/test_dir1"
+    local expected="/usr/bin/rm -r -I -- /tmp/test_dir1"
     local received="$(rm_confirm -r /tmp/test_dir1)"
     test_expect "$expected" "$received"
 }
 
 test_recurive_force_opt() {
-    local expected="rm -rf -I -- /tmp/test_dir1"
+    local expected="/usr/bin/rm -rf -I -- /tmp/test_dir1"
     local received="$(rm_confirm -rf /tmp/test_dir1)"
     test_expect "$expected" "$received"
 }
 
 test_ignore_posarg_split() {
-    local expected="rm -f -- /tmp/test_file1 /tmp/test_file2"
+    local expected="/usr/bin/rm -f -- /tmp/test_file1 /tmp/test_file2"
     local received="$(rm_confirm -f -- /tmp/test_file1 /tmp/test_file2)"
     test_expect "$expected" "$received"
 }
 
 test_symlink() {
-    local expected="rm -i -- /tmp/test_link"
+    local expected="/usr/bin/rm -i -- /tmp/test_link"
     local received="$(rm_confirm /tmp/test_link)"
     test_expect "$expected" "$received"
 }
