@@ -35,7 +35,7 @@ eval "$(pyenv virtualenv-init -)"
 
 # [[ ALIASES ]]
 alias cp='rsync --info=progress2'
-alias df='df -hx tmpfs'
+alias df='/usr/bin/df -hx tmpfs'
 alias dot='git --git-dir="$HOME/repos/dotfiles" --work-tree="$HOME"'
 alias sup='sudo pacman'
 alias supc='sup -Scc'
@@ -70,7 +70,7 @@ ls_format() {
     local flag_touch=0
     if [ $# -eq 0 ]; then
         pwd &&
-        ls "${default_args[@]}" | tail -fn +2 | awk "${list_pattern}"
+        /usr/bin/ls "${default_args[@]}" | tail -fn +2 | awk "${list_pattern}"
         return "$?"
     fi
 
@@ -81,9 +81,9 @@ ls_format() {
     done
     if [ "$flag_touch" -eq 1 ]; then
         pwd &&
-        ls -h "${default_args[@]:1}" "$@"| tail -fn +2 | awk "${list_pattern}"
+        /usr/bin/ls -h "${default_args[@]:1}" "$@"| tail -fn +2 | awk "${list_pattern}"
     else
-        ls -h ${default_args[@]:1} "$@"
+        /usr/bin/ls -h ${default_args[@]:1} "$@"
     fi
 }
 
@@ -104,9 +104,9 @@ rm_confirm() {
         fi
     done
     case "$flag_touch" in
-        1) rm "${opt_args[@]}" -I -- "${pos_args[@]}" ;;
-        2) rm "${opt_args[@]}" -i -- "${pos_args[@]}" ;;
-        *) rm "${opt_args[@]}" -- "${pos_args[@]}" ;;
+        1) /usr/bin/rm "${opt_args[@]}" -I -- "${pos_args[@]}" ;;
+        2) /usr/bin/rm "${opt_args[@]}" -i -- "${pos_args[@]}" ;;
+        *) /usr/bin/rm "${opt_args[@]}" -- "${pos_args[@]}" ;;
     esac
 }
 
@@ -114,8 +114,8 @@ tree_format() {
     local ignore_pattern="venv|__pycache__|node_modules|.git"
     local flag_touch=0
 
-    which tree &>/dev/null
-    [ $? -eq 0 ] || "$(tree && return 1)"
+    which /usr/bin/tree &>/dev/null
+    [ $? -eq 0 ] || "$(/usr/bin/tree && return 1)"
 
     for i in "$@"; do
         if [ -d "$i" ]; then
@@ -124,7 +124,7 @@ tree_format() {
         fi
     done
     if [ "$flag_touch" -ne 1 ]; then pwd; fi
-    tree --dirsfirst -I "$ignore_pattern" -L 2 "$@" | tail -n +2 | head -n -2
+    /usr/bin/tree --dirsfirst -I "$ignore_pattern" -L 2 "$@" | tail -n +2 | head -n -2
 }
 
 alias cd='cd_format'
