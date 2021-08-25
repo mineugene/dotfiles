@@ -104,7 +104,7 @@ tree_format() {
     local flag_touch=0
 
     which tree &>/dev/null
-    [ $? -eq 0 ] || echo "tree: command not found"
+    [ $? -eq 0 ] || "$(tree && return 1)"
 
     for i in "$@"; do
         if [ -d "$i" ]; then
