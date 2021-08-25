@@ -112,6 +112,12 @@ rm_confirm() {
 
 tree_format() {
     local ignore_pattern="venv|__pycache__|node_modules|.git"
+    local default_args=(
+        "--dirsfirst"
+        "--filelimit" "16"
+        "-I" "\"$ignore_pattern\""
+        "-L" "2"
+    )
     local flag_touch=0
 
     which /usr/bin/tree &>/dev/null
@@ -120,11 +126,18 @@ tree_format() {
     for i in "$@"; do
         if [ -d "$i" ]; then
             flag_touch=1
-            echo "$(pwd)/$i"; break
+            echo "$(realpath "$i")"; break
         fi
     done
     if [ "$flag_touch" -ne 1 ]; then pwd; fi
-    /usr/bin/tree --dirsfirst -I "$ignore_pattern" -L 2 "$@" | tail -n +2 | head -n -2
+
+    local head="$(/usr/bin/tree "${default_args[@]}" "$@" | head -n 1)"
+    if [ -d "$head" ]
+    then
+        /usr/bin/tree "${default_args[@]}" "$@" | tail -n +2 | head -n -2
+    else
+        echo "${head/+([![])/}"
+    fi
 }
 
 alias cd='cd_format'
