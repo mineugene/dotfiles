@@ -6,7 +6,7 @@
 [[ $- != *i* ]] && return
 
 # [[ PROMPT COLOUR ]]
-# 24b RGB-colour for prompt {foreground,background}
+# 24b RGB-colour for prompt; foreground & background
 PS1_FG_COLOR="232;233;236"
 PS1_BG_COLOR="051;055;076"
 
@@ -17,10 +17,10 @@ PS1_CCODE_MAIN_BG="\x1b[48;2;${PS1_BG_COLOR}m"
 PS1_CCODE_RSET="\x1b[0m"
 
 # CMAIN: specified colour codes from above variables
-CMAIN=$(printf "\\[${PS1_CCODE_MAIN_FG}\\]\\[${PS1_CCODE_MAIN_BG}\\]")
-CRSET=$(printf "\\[${PS1_CCODE_RSET}\\]")
+CMAIN="$(printf "\\[%b\\]\[%b\\]" "${PS1_CCODE_MAIN_FG}" "${PS1_CCODE_MAIN_BG}")"
+CRSET="$(printf "\\[%b\\]" "${PS1_CCODE_RSET}")"
 
-PS1="${CMAIN} \D{"%Y-%m-%d"} \A [\u] ${CRSET} \$ "
+PS1="${CMAIN} \D{%Y-%m-%d} \A [\u] ${CRSET} \$ "
 PS2="${CMAIN}    ${CRSET} ▶ "
 
 # [[ PATH ]]
@@ -46,28 +46,35 @@ alias supy='sup -Syy'
 alias vim='nvim'
 
 cd_format() {
-    local curr_dir="$(pwd)"
-    local next_dir=""
+    declare curr_dir=""
+    declare next_dir=""
+
+    curr_dir="$(pwd)"
     if [ "$#" -eq 0 ]; then echo "$curr_dir" && return 0; fi
     for i in "$@"; do
         if [ -d "$i" ]; then next_dir="$i" && break; fi
     done
-    echo "$(realpath $next_dir) ◀ $curr_dir"
-    builtin cd "$@"
+    echo "$(realpath "$next_dir") ◀ $curr_dir"
+    builtin cd "$@" || return 1
 }
 
 ls_format() {
-    local default_args=(
+    declare default_args=()
+    declare list_pattern=""
+    declare -i flag_touch=0
+
+    default_args=(
         "-lXh"
         "--color=auto"
         "--group-directories-first"
     )
-    local list_pattern='
+    # shellcheck disable=SC2016
+    # variables in list_pattern pertains to awk syntax: do not escape
+    list_pattern='
         /^d(...){3}/ {print "\033[0;94m" $0 "\033[0;39m"}
         /^l(...){3}/ {print "\033[5;96m" $0 "\033[0;39m"}
         /^[^dl]/ {print $0}
     '
-    local flag_touch=0
     if [ $# -eq 0 ]; then
         pwd &&
         /usr/bin/ls "${default_args[@]}" | tail -fn +2 | awk "${list_pattern}"
@@ -83,14 +90,14 @@ ls_format() {
         pwd &&
         /usr/bin/ls -h "${default_args[@]:1}" "$@"| tail -fn +2 | awk "${list_pattern}"
     else
-        /usr/bin/ls -h ${default_args[@]:1} "$@"
+        /usr/bin/ls -h "${default_args[@]:1}" "$@"
     fi
 }
 
 rm_confirm() {
-    local opt_args=()
-    local pos_args=()
-    local flag_touch=0
+    declare opt_args=()
+    declare pos_args=()
+    declare -i flag_touch=0
 
     for i in "$@"; do
         if echo "$i" | grep -qe "^--\?[a-zA-Z]\+"; then
@@ -111,27 +118,31 @@ rm_confirm() {
 }
 
 tree_format() {
-    local ignore_pattern="venv|__pycache__|node_modules|.git"
-    local default_args=(
+    declare ignore_pattern=""
+    declare head=""
+    declare default_args=()
+    declare -i flag_touch=0
+
+    ignore_pattern="|venv|__pycache__|node_modules|.git"
+    default_args=(
         "--dirsfirst"
         "--filelimit" "32"
-        "-I" "\"$ignore_pattern\""
+        "-I" "'$ignore_pattern'"
         "-L" "2"
     )
-    local flag_touch=0
-
-    which /usr/bin/tree &>/dev/null
-    [ $? -eq 0 ] || "$(/usr/bin/tree && return 1)"
+    if /usr/bin/tree &>/dev/null; then
+        /usr/bin/tree && return 1
+    fi
 
     for i in "$@"; do
         if [ -d "$i" ]; then
             flag_touch=1
-            echo "$(realpath "$i")"; break
+            realpath "$i"; break
         fi
     done
     if [ "$flag_touch" -ne 1 ]; then pwd; fi
 
-    local head="$(/usr/bin/tree "${default_args[@]}" "$@" | head -n 1)"
+    head="$(/usr/bin/tree "${default_args[@]}" "$@" | head -n 1)"
     if [ -d "$head" ]
     then
         /usr/bin/tree "${default_args[@]}" "$@" | tail -n +2 | head -n -2
