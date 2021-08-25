@@ -134,7 +134,7 @@ tree_format() {
         "-I" "'$ignore_pattern'"
         "-L" "2"
     )
-    if /usr/bin/tree &>/dev/null; then
+    if ! which /usr/bin/tree &>/dev/null; then
         /usr/bin/tree && return 1
     fi
 
