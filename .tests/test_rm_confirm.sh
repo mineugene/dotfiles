@@ -7,11 +7,14 @@ rm_confirm() {
 
     for i in "$@"; do
         if echo "$i" | grep -qe "^--\?[a-zA-Z]\+"; then
+            # optional argument
             opt_args+=("$i")
             if echo "$i" | grep -qe "^-[a-zA-Z]*r"; then
+                # recursive flag matched
                 flag_touch=1
             fi
         else
+            # positional argument
             [ "$i" == "--" ] || pos_args+=("$i")
             if [ -h "$i" ]; then flag_touch=2; fi
         fi
