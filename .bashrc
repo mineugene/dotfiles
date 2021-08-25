@@ -52,10 +52,14 @@ cd_format() {
     curr_dir="$(pwd)"
     if [ "$#" -eq 0 ]; then echo "$curr_dir" && return 0; fi
     for i in "$@"; do
-        if [ -d "$i" ]; then next_dir="$i" && break; fi
+        if [ -d "$i" ]; then
+            next_dir="$(realpath "$i")"
+            break
+        fi
     done
-    echo "$(realpath "$next_dir") ◀ $curr_dir"
-    builtin cd "$@" || return 1
+    if builtin cd "$@"; then
+        echo "$next_dir ◀ $curr_dir"
+    fi
 }
 
 ls_format() {
