@@ -1,0 +1,14 @@
+[user]
+	email = mineugene@users.noreply.github.com
+	name = mineugene
+	signingkey = 9FE660645CCD23FF
+[init]
+	defaultBranch = master
+[gpg]
+	program = gpg2
+[pull]
+	rebase = false
+[core]
+	editor = nvim
+[credential]
+	helper = cache --timeout=32000
