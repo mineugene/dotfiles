@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 rm_confirm() {
     declare opt_args=()
@@ -27,10 +27,10 @@ rm_confirm() {
 }
 
 test_out() {
-    if [ "$?" -ne 0 ]; then
-        echo -e "\033[0;31m$1 failed...\033[0;0m"
+    if [ "$1" -ne 0 ]; then
+        echo -e "\033[0;31m$2 failed...\033[0;0m"
     else
-        echo -e "\033[0;32m$1 passed\033[0;0m"
+        echo -e "\033[0;32m$2 passed\033[0;0m"
     fi
 }
 
@@ -45,55 +45,72 @@ test_expect() {
 }
 
 test_plain_file() {
-    local expected="/usr/bin/rm -- /tmp/test_file1"
-    local received="$(rm_confirm /tmp/test_file1)"
+    declare expected="/usr/bin/rm -- /tmp/test_file1"
+    declare received
+
+    received="$(rm_confirm /tmp/test_file1)"
     test_expect "$expected" "$received"
 }
 
 test_empty_dir () {
-    local expected="/usr/bin/rm -d -- /tmp/test_dir1"
-    local received="$(rm_confirm -d /tmp/test_dir1)"
+    declare expected="/usr/bin/rm -d -- /tmp/test_dir1"
+    declare received
+
+    received="$(rm_confirm -d /tmp/test_dir1)"
     test_expect "$expected" "$received"
 }
 
 test_mult_files() {
-    local expected="/usr/bin/rm -- /tmp/test_file1 /tmp/test_file2 /tmp/test_file3"
-    local received="$(rm_confirm /tmp/test_file1 /tmp/test_file2 /tmp/test_file3)"
+    declare expected="/usr/bin/rm -- /tmp/test_file1 /tmp/test_file2 /tmp/test_file3"
+    declare received
+
+    received="$(rm_confirm /tmp/test_file1 /tmp/test_file2 /tmp/test_file3)"
     test_expect "$expected" "$received"
 }
 
 test_mult_dirs() {
-    local expected="/usr/bin/rm -d -- /tmp/test_dir1 /tmp/test_dir2 /tmp/test_dir3"
-    local received="$(rm_confirm -d /tmp/test_dir1 /tmp/test_dir2 /tmp/test_dir3)"
+    declare expected="/usr/bin/rm -d -- /tmp/test_dir1 /tmp/test_dir2 /tmp/test_dir3"
+    declare received
+
+    received="$(rm_confirm -d /tmp/test_dir1 /tmp/test_dir2 /tmp/test_dir3)"
     test_expect "$expected" "$received"
 }
 
 test_recurive_opt() {
-    local expected="/usr/bin/rm -r -I -- /tmp/test_dir1"
-    local received="$(rm_confirm -r /tmp/test_dir1)"
+    declare expected="/usr/bin/rm -r -I -- /tmp/test_dir1"
+    declare received
+
+    received="$(rm_confirm -r /tmp/test_dir1)"
     test_expect "$expected" "$received"
 }
 
 test_recurive_force_opt() {
-    local expected="/usr/bin/rm -rf -I -- /tmp/test_dir1"
-    local received="$(rm_confirm -rf /tmp/test_dir1)"
+    declare expected="/usr/bin/rm -rf -I -- /tmp/test_dir1"
+    declare received
+
+    received="$(rm_confirm -rf /tmp/test_dir1)"
     test_expect "$expected" "$received"
 }
 
 test_ignore_posarg_split() {
-    local expected="/usr/bin/rm -f -- /tmp/test_file1 /tmp/test_file2"
-    local received="$(rm_confirm -f -- /tmp/test_file1 /tmp/test_file2)"
+    declare expected="/usr/bin/rm -f -- /tmp/test_file1 /tmp/test_file2"
+    declare received
+
+    received="$(rm_confirm -f -- /tmp/test_file1 /tmp/test_file2)"
     test_expect "$expected" "$received"
 }
 
 test_symlink() {
-    local expected="/usr/bin/rm -i -- /tmp/test_link"
-    local received="$(rm_confirm /tmp/test_link)"
+    declare expected="/usr/bin/rm -i -- /tmp/test_link"
+    declare received
+
+    received="$(rm_confirm /tmp/test_link)"
     test_expect "$expected" "$received"
 }
 
 test_run() {
-    local test_suite=(
+    declare -i exit_code=1
+    declare test_suite=(
         test_plain_file
         test_empty_dir
         test_mult_files
@@ -107,8 +124,8 @@ test_run() {
     touch /tmp/test_file{1..3}.dat
     ln -s /tmp/test_file2 /tmp/test_link
     for t in "${test_suite[@]}"; do
-        $t
-        test_out "$t"
+        exit_code=$t
+        test_out "$exit_code" "$t"
     done
     rm -r /tmp/test_dir*
     rm /tmp/test_file*.dat
