@@ -30,10 +30,9 @@ cd_format() {
     fi
 }
 
-ls_format() {
+ls_long_format() {
     declare default_args=()
     declare list_pattern=""
-    declare -i flag_touch=0
 
     default_args=(
         "-lXh"
@@ -47,25 +46,26 @@ ls_format() {
         /^l(...){3}/ {print "\033[5;96m" $0 "\033[0;39m"}
         /^[^dl]/ {print $0}
     '
+    pwd &&
+    /usr/bin/ls "${default_args[@]}" "$@"| tail -fn +2 | awk "${list_pattern}"
+}
+
+ls_format() {
+    declare -i flag_touch=0
+
     if [ $# -eq 0 ]; then
-        pwd
-        if /usr/bin/ls "${default_args[@]}" | tail -fn +2 | awk "${list_pattern}"
-        then
-            return 0
-        fi
+        if ls_long_format; then return 0; fi
         return 1
     fi
-
     for i in "$@"; do
-        if echo "$i" | grep -qe "^-[a-zA-Z]*l"; then
+        if echo "$i" | grep -qe "^--\?[a-zA-Z]\+"; then
             flag_touch=1; break
         fi
     done
-    if [ "$flag_touch" -eq 1 ]; then
-        pwd &&
-        /usr/bin/ls -h "${default_args[@]:1}" "$@"| tail -fn +2 | awk "${list_pattern}"
+    if [ "$flag_touch" -eq 0 ]; then
+        ls_long_format "$@"
     else
-        /usr/bin/ls -h "${default_args[@]:1}" "$@"
+        /usr/bin/ls -h --color=auto --group-directories-first "$@"
     fi
 }
 
