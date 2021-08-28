@@ -1,19 +1,46 @@
-#! /bin/sh
+#!/bin/bash
 
-pgrep -x sxhkd > /dev/null || sxhkd &
+pgrep -x sxhkd 1>/dev/null || sxhkd &
 
-bspc monitor DP-2 I II III IV V VI VII VIII IX
-bspc monitor HDMI-0 X
+bspc_config_global() {
+    declare -A props=(
+        # colours
+        ["normal_border_color"]="#9EAAB8"
+        ["active_border_color"]="#5C7A92"
+        ["focused_border_color"]="#2F506B"
+        ["presel_feedback_color"]="#2A2F32"
+        # spacing
+        ["border_width"]=2
+        ["window_gap"]=7
+        ["split_ratio"]=0.50
+        ["borderless_monocle"]="true"
+        ["gapless_monocle"]="true"
+        # scheme
+        ["automatic_scheme"]="longest_side"
+        # pointer
+        ["focus_follows_pointer"]="false"
+        ["pointer_follows_focus"]="true"
+        ["pointer_follows_monitor"]="true"
+    )
+    for k in "${!props[@]}"; do
+        bspc config "$k" "${props[$k]}"
+    done
+}
 
-bspc config border_width         2
-bspc config window_gap           7
+bspc_config_monitors() {
+    declare -a desktop_names
+    declare -a workspaces
 
-bspc config split_ratio          0.52
-bspc config borderless_monocle   true
-bspc config gapless_monocle      true
+    desktop_names=("0" "1" "2" "3" "4" "5" "6" "7" "8" "9")
+    # rotate desktop names with monitor count
+    for ((monitor_id=1; monitor_id<=$#; ++monitor_id)); do
+        workspaces=()
+        for ((i=monitor_id-1; i<${#desktop_names[@]}; i+=$#)); do
+            workspaces+=("${desktop_names[$i]}")
+        done
+        bspc monitor "${!monitor_id}" -d "${workspaces[@]}"
+    done
+}
 
-bspc rule -a Gimp desktop='^8' state=floating follow=on
-bspc rule -a Chromium desktop='^2'
-bspc rule -a mplayer2 state=floating
-bspc rule -a Kupfer.py focus=on
-bspc rule -a Screenkey manage=off
+bspc_config_monitors "DP-2" "HDMI-0"
+bspc_config_global
