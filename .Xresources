@@ -2,7 +2,7 @@ URxvt.loginShell: true
 URxvt.background: rgba:E800/E900/EC00/CCCC
 URxvt.cursorBlink: true
 URxvt.depth: 32
-URxvt.font: xft:iosevka-ss16-heavy:pixelsize=20,xft:DejaVuSansMono:pixelsize=16
+URxvt.font: xft:iosevka-ss16-heavy:pixelsize=20,xft:DejaVuSansMono:pixelsize=16,xft:NanumMyeongjo:pixelsize=16
 URxvt.boldFont: xft:iosevka-ss16-extrabold:pixelsize=20
 URxvt.italicFont: xft:iosevka-ss16-heavy:style=Heavy Italic:pixelsize=20
 URxvt.boldItalicFont: xft:iosevka-ss16-extrabold:style=Extrabold Italic:pixelsize=20
