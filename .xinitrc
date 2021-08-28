@@ -36,6 +36,6 @@ BG_IMG=(
 
 setxkbmap dvorak &
 xsetroot -cursor_name left_ptr &
-feh --bg-fill ${BG_IMG[@]}
+feh --bg-fill ${BG_IMG[@]} &
 picom &
 exec bspwm
