@@ -15,8 +15,8 @@ bspc_config_global() {
         ["focused_border_color"]="#2F506B"
         ["presel_feedback_color"]="#2A2F32"
         # spacing
-        ["border_width"]=4
-        ["window_gap"]=24
+        ["border_width"]=2
+        ["window_gap"]=7
         ["split_ratio"]=0.50
         ["borderless_monocle"]="true"
         ["gapless_monocle"]="true"
