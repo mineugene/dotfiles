@@ -24,6 +24,8 @@ if [ -z "$polybar_id" ]; then
     polybar -q -c "$HOME/.config/polybar/config.ini" main -r &
 fi
 
+# polybar-winlist is a symbolic link from $PATH that points to
+#     ./scripts/window-list.sh
 polybar_winlist_id="$(process_stop "polybar-winlist")"
 if [ -z "$polybar_winlist_id" ]; then
     polybar-winlist &
