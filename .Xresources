@@ -7,7 +7,7 @@ URxvt.boldFont: xft:iosevka-ss16-extrabold:pixelsize=20
 URxvt.italicFont: xft:iosevka-ss16-heavy:style=Heavy Italic:pixelsize=20
 URxvt.boldItalicFont: xft:iosevka-ss16-extrabold:style=Extrabold Italic:pixelsize=20
 URxvt.letterSpace: 0
-URxvt.internalBorder: 22
+URxvt.internalBorder: 0
 URxvt.secondaryScreen: 1
 URxvt.secondaryScroll: 0
 URxvt.secondaryWheel: 1
