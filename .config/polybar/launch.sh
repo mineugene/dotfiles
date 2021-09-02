@@ -30,6 +30,3 @@ polybar_winlist_id="$(process_stop "polybar-winlist")"
 if [ -z "$polybar_winlist_id" ]; then
     polybar-winlist &
 fi
-
-# misc: bar-to-window space gap adjustment
-sleep 5e-1; bspc config -m focused top_padding 0
