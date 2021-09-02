@@ -1,7 +1,9 @@
 #!/bin/bash
 
+# required
 pgrep -x sxhkd 1>/dev/null || sxhkd &
 
+# global
 bspc_config_global() {
     declare -A props=(
         # colours
@@ -27,6 +29,7 @@ bspc_config_global() {
     done
 }
 
+# desktop and monitor
 bspc_config_monitors() {
     declare -a desktop_names
     declare -a workspaces
@@ -42,5 +45,6 @@ bspc_config_monitors() {
     done
 }
 
+# exec select configs
 bspc_config_monitors "DP-2" "HDMI-0"
 bspc_config_global
