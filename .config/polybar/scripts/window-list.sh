@@ -138,6 +138,7 @@ listen_events() {
 
     events=(
         "desktop_focus"
+        "desktop_layout"
         "node_focus"
         "node_remove"
     )
