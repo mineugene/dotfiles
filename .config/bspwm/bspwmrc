@@ -2,6 +2,9 @@
 
 # required
 pgrep -x sxhkd 1>/dev/null || sxhkd &
+# imports
+[ -f "$HOME/.config/polybar/launch.sh" ] && . ~/.config/polybar/launch.sh &
+type nm-applet && nm-applet --no-agent &
 
 # global
 bspc_config_global() {
