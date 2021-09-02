@@ -24,7 +24,8 @@ PS1="${CMAIN} \D{%Y-%m-%d} \A [\u] ${CRSET} \$ "
 PS2="${CMAIN}    ${CRSET} ▶ "
 
 # [[ PATH ]]
-PATH="/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/home/mineugene/.cargo/bin:$PYENV_ROOT/bin"
+PATH="/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:$PYENV_ROOT/bin"
+
 
 # [[ PYENV CONFIG ]]
 # installed with pyenv/pyenv-installer
