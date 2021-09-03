@@ -65,14 +65,11 @@ main() {
             ;;
         *)
             echo "$0: $1: invaild option"
-            break
+            reset && break
             ;;
         esac
     done
-    if [ "$#" -eq 0 ] && [ "$SIG_START" -gt 0 ]; then
-        if [ "$POLYBAR_ID" -eq 0 ] || [ -z "$POLYBAR_CACHE" ]; then
-            echo "$0: $POLYBAR_CACHE: (test) cache was not created"
-        fi
+    if [ "$SIG_START" -gt 0 ]; then
         listen_events  # start event loop
     fi
 }
@@ -116,6 +113,12 @@ set_pid() {
         return 0
     fi
     return 1
+}
+
+reset() {
+    POLYBAR_ID=0 && POLYBAR_CACHE=""
+    SIG_START=0
+    return 0
 }
 
 get_node_id_list() {
