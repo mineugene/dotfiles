@@ -24,7 +24,11 @@ PS1="${CMAIN} \D{%Y-%m-%d} \A [\u] ${CRSET} \$ "
 PS2="${CMAIN}    ${CRSET} ▶ "
 
 # [[ PATH ]]
-PATH="/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/home/mineugene/.cargo/bin:$PYENV_ROOT/bin"
+# (1)local (2)perl (3)stylua dep (4)pyenv dep
+PATH="/usr/local/sbin:/usr/local/bin:/usr/bin"
+PATH="$PATH:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl"
+PATH="$PATH:/home/mineugene/.cargo/bin"
+PATH="$PATH:$PYENV_ROOT/bin"
 
 # [[ TERM WINDOW-CUSTOM TITLE ]]
 case "$TERM" in
