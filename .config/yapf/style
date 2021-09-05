@@ -1,0 +1,12 @@
+[style]
+based_on_style = pep8
+arithmetic_precedence_indication=True
+coalesce_brackets=True
+column_limit=90
+dedent_closing_brackets=True
+indent_dictionary_value=True
+indent_width=4
+split_before_dot=True
+split_before_expression_after_opening_paren=True
+split_before_first_argument=True
+use_tabs=False

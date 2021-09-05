@@ -1,0 +1,6 @@
+[pycodestyle]
+count = False
+ignore = E701,E226,E227,E228
+indent-size = 4
+max-line-length = 90
+statistics = True
