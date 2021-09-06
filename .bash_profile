@@ -3,7 +3,7 @@
 #
 
 if [ -z "${DISPLAY}" ] && [ "${XDG_VTNR}" -eq 1 ]; then
-  exec startx
+    exec startx 1>/dev/null 2>&1
 fi
 
 # GPG and SSH
