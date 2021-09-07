@@ -1,6 +1,7 @@
 [style]
 based_on_style = pep8
 arithmetic_precedence_indication=True
+blank_line_before_nested_class_or_def=True
 coalesce_brackets=True
 column_limit=79
 dedent_closing_brackets=True
