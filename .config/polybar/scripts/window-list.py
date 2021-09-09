@@ -445,8 +445,8 @@ def main(*args, **kwargs):
     parser = argparse.ArgumentParser()
     parser.add_argument("pid", type=int, nargs='?', default=0)
     parser.add_argument("cache", type=pathlib.Path, action="store", nargs='?')
-    parser.add_argument(*["--start", "--s"], action="store_true")
-    parser.add_argument(*["--tail", "--t"], action="store_true")
+    parser.add_argument(*["--start", "-s"], action="store_true")
+    parser.add_argument(*["--tail", "-t"], action="store_true")
 
     setup_config = parser.parse_args(args)
 
