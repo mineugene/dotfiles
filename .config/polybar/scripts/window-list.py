@@ -429,7 +429,7 @@ def main(*args, **kwargs):
         *["--start", "--s"], type=int, nargs='?', const=0, default=0
     )
 
-    setup_config = parser.parse_args()
+    setup_config = parser.parse_args(args)
 
     c = Controller(setup_config.start)
     c.start_listener()
