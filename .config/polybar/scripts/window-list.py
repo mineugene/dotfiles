@@ -2,6 +2,7 @@
 
 import argparse
 import os
+import pathlib
 import signal
 import stat
 import subprocess
@@ -289,12 +290,14 @@ class Controller(object):
     CACHE_DIR = os.getenv("HOME") + "/.cache/polybar"
     HOOK_TAIL_ID = 1
 
-    def __init__(self, polybar_pid=0):
+    def __init__(self, polybar_pid=0, polybar_cache=None):
         """Constructor method
         """
         # default setup values
         self._polybar_pid = polybar_pid
-        self._polybar_cache = self.CACHE_DIR + f"/window-list.{polybar_pid}"
+        self._polybar_cache = polybar_cache
+        if polybar_cache is None:
+            self._polybar_cache = f"{self.CACHE_DIR}/window-list"
 
     def __del__(self):
         """Destructor method
@@ -330,13 +333,16 @@ class Controller(object):
         return self._polybar_cache
 
     @cache_file.setter
-    def cache_file(self, filename: str):
+    def cache_file(self, cache_path: str):
         # parent dir for temp files does not exist
-        if not os.path.isdir(self.CACHE_DIR):
+        cache_parsed = pathlib.Path(cache_path)
+        if not os.path.isdir(cache_parsed.parent):
             os.mkdir(self.CACHE_DIR, mode=0o755 | stat.S_IFDIR)
+
         # format a unique name for temp file per polybar process
-        self._polybar_cache = self.CACHE_DIR + \
-            f"/{filename}.{self._polybar_pid}"
+        self._polybar_cache = str(cache_parsed.parent) + \
+            f"/{cache_parsed.name}.{self._polybar_pid}"
+
         try:
             os.mknod(self._polybar_cache, mode=0o644 | stat.S_IFREG)
         except FileExistsError:
@@ -371,6 +377,15 @@ class Controller(object):
             if pipe.stdout.rstrip():
                 self._polybar_pid = pid
 
+    @classmethod
+    def tail(cls, polybar_pid: int, cache_path=None) -> str:
+        if cache_path is None:
+            cache_path = f"{cls.CACHE_DIR}/window-list"
+        cache_path = str(pathlib.Path(cache_path)) + f".{polybar_pid}"
+        with open(cache_path, "r") as rc:
+            lines = rc.readlines()
+            print(lines[-1] if len(lines) != 0 else "", end="")
+
     def polybar_hook_notify(self, hook_id: int):
         """Sends an inter-processing commuication message to a polybar module
         :param hook_id: a 1-based index refering to the tail hook id
@@ -394,7 +409,8 @@ class Controller(object):
         """
         # unique instance tied to polybar pid
         self.polybar_pid = self._polybar_pid
-        self.cache_file = "window-list"
+        if self._polybar_pid != 0:
+            self.cache_file = self._polybar_cache
 
         d_node = NodeDriver()
         d_wminfo = WindowInfoDriver()
@@ -425,14 +441,21 @@ class Controller(object):
 
 def main(*args, **kwargs):
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        *["--start", "--s"], type=int, nargs='?', const=0, default=0
-    )
+    parser.add_argument("pid", type=int, nargs='?', default=0)
+    parser.add_argument("cache", type=pathlib.Path, action="store", nargs='?')
+    parser.add_argument(*["--start", "--s"], action="store_true")
+    parser.add_argument(*["--tail", "--t"], action="store_true")
 
     setup_config = parser.parse_args(args)
 
-    c = Controller(setup_config.start)
-    c.start_listener()
+    if setup_config.tail:
+        try:
+            Controller.tail(setup_config.pid, setup_config.cache)
+        except FileNotFoundError as e:
+            print(f"{e.strerror}: '{e.filename}'")
+    if setup_config.start:
+        c = Controller(setup_config.pid, setup_config.cache)
+        c.start_listener()
 
 
 if __name__ == "__main__":
