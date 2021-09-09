@@ -133,6 +133,8 @@ class WindowInfoDriver(object):
         :param line: A line from 'wmctrl' list output
         :return: Hashed column names with its values
         """
+        if line == "":
+            return {}
         # filter out redundant whitespace special characters
         wminfo = " ".join(line.split()).encode("ascii", errors="ignore")
         # parse columns
@@ -157,6 +159,8 @@ class WindowInfoDriver(object):
         result = {}
         for line in pipe.stdout.rstrip().split("\n"):
             tokenized_line = self._map_wmctrl_line(line)
+            if "id" not in tokenized_line:
+                continue
             id = tokenized_line.pop("id", 0)  # extract window id
             result[id] = tokenized_line  # key: window id, value: props
         return result
