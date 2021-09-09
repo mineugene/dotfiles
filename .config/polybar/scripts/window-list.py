@@ -6,6 +6,7 @@ import signal
 import stat
 import subprocess
 import sys
+import typing
 
 
 class Node(object):
@@ -58,7 +59,7 @@ class EventListener(object):
     ]
 
     @classmethod
-    def start(cls) -> str:
+    def start(cls) -> typing.Iterator[str]:
         """A generator for triggered events that 'bspc subscribe' observes
 
         :return: Representation of event (see 'man bspc' for event format)
