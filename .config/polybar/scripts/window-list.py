@@ -403,15 +403,18 @@ class Controller(object):
 
         o = WindowListInteractor(repo, formatter)
         try:
-            for event in EventListener.start():
-                # default behaviour
+            event = EventListener.start()
+            while True:
                 if self._polybar_pid == 0:
+                    # default behaviour
                     print(o.get_output())
-                    continue
-                # non-zero pid; write to polybar cache and notify
-                with open(self._polybar_cache, "w+") as f:
-                    print(o.get_output(), file=f)
-                self.polybar_hook_notify(self.HOOK_TAIL_ID)
+                else:
+                    # non-zero pid; write to polybar cache and notify
+                    with open(self._polybar_cache, "w+") as f:
+                        print(o.get_output(), file=f)
+                    self.polybar_hook_notify(self.HOOK_TAIL_ID)
+
+                next(event)
         except EOFError:
             pass
         except Exception:
