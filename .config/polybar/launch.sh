@@ -12,9 +12,9 @@ process_stop() {
     declare -i i=0  # number of attempts to stop process
 
     while pgrep "${grep_arg}" "$process_name" 1>/dev/null; do
-        pkill "$process_name" --signal TERM 1>/dev/null
+        if [ "$((i++))" -gt 10 ]; then return 1; fi
+        pkill "${grep_arg}" "$process_name" --signal TERM 1>/dev/null
         sleep 5e-2
-        [ "$((i++))" -gt 10 ] && return 1
     done
     return 0
 }
@@ -35,5 +35,5 @@ if process_stop -f "polybar-winlist"; then
     polybar-winlist --start "$polybar_id" &
     echo "DONE"
 else
-    echo -e "\n\t$0: failed to restart window-list module"
+    echo -e "\n\t$0: failed to restart the window-list module"
 fi
