@@ -431,7 +431,7 @@ class Controller(object):
                     self.polybar_hook_notify(self.HOOK_TAIL_ID)
 
                 next(event)
-        except EOFError:
+        except (EOFError, KeyboardInterrupt):
             pass
         except Exception:
             # in case of unhandled exception, notify last time before exit
