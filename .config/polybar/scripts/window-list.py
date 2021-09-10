@@ -332,23 +332,37 @@ class Controller(object):
         """
         if os.path.isfile(self._polybar_cache):
             os.remove(self._polybar_cache)
-        # self.polybar_hook_notify(1)
 
-    @property
-    def cache_file(self) -> str:
-        return self._polybar_cache
+    def _redirect_output(self, output):
+        """Helper for redirecting output based on state of Controller, or the
+        passed args when starting this script.
 
-    @cache_file.setter
-    def cache_file(self, cache_path: str):
-        # parent dir for temp files does not exist
-        cache_parsed = pathlib.Path(cache_path)
-        if not os.path.isdir(cache_parsed.parent):
+        :effects: Writes to stdout or temporary file
+        :param output: The formatted output to write
+        """
+        if self._polybar_pid == 0:
+            # default behaviour
+            print(output)
+            return
+        # non-zero pid; write to polybar cache and notify
+        with open(self._polybar_cache, "w+") as f:
+            print(output, file=f)
+        self.polybar_hook_notify(self.HOOK_TAIL_ID)
+
+    def _create_cache_dir(self):
+        """Ensures parent directory for cache file exists
+        :effects: Writes a local directory to Controller.CACHE_DIR
+        """
+        try:
+            # ensure parent dir exists
             os.mkdir(self.CACHE_DIR, mode=0o755 | stat.S_IFDIR)
+        except FileExistsError:
+            pass
 
-        # format a unique name for temp file per polybar process
-        self._polybar_cache = str(cache_parsed.parent) + \
-            f"/{cache_parsed.name}.{self._polybar_pid}"
-
+    def _create_cache_file(self):
+        """Creates a unique cache file for the polybar module to read
+        :effects: Writes a unique temporary local file specified by given args
+        """
         try:
             os.mknod(self._polybar_cache, mode=0o644 | stat.S_IFREG)
         except FileExistsError:
@@ -363,12 +377,11 @@ class Controller(object):
                     continue
                 signal.signal(sig, self._destroy)
 
-    @property
-    def polybar_pid(self) -> int:
-        return self._polybar_pid
-
-    @polybar_pid.setter
-    def polybar_pid(self, pid: int):
+    @staticmethod
+    def validate_polybar_pid(pid: int):
+        """Validates existence of pid and determines if it belongs to polybar
+        :param pid: The process id specified by given args
+        """
         if pid < 0:
             raise ValueError
         try:
@@ -376,12 +389,35 @@ class Controller(object):
         except (ProcessLookupError, PermissionError):
             pass
         else:
-            # assign pid only if it belongs to polybar
+            # fetch process name of pid
             cmd = f"ps -p {pid} -o comm=".split()
             pipe = subprocess.run(cmd, capture_output=True, text=True)
-            self._polybar_pid = 0  # reset stale pid
-            if pipe.stdout.rstrip():
-                self._polybar_pid = pid
+            if pipe.stdout.rstrip() == "polybar":
+                return True
+        return False
+
+    @property
+    def cache_file(self) -> str:
+        return self._polybar_cache
+
+    @cache_file.setter
+    def cache_file(self, cache_path: str):
+        cache_parsed = pathlib.Path(cache_path)
+        # format a unique name for temp file per polybar process
+        self._polybar_cache = str(cache_parsed.parent) + \
+            f"/{cache_parsed.name}.{self._polybar_pid}"
+
+        self._create_cache_dir()
+        self._create_cache_file()
+
+    @property
+    def polybar_pid(self) -> int:
+        return self._polybar_pid
+
+    @polybar_pid.setter
+    def polybar_pid(self, pid: int):
+        if self.validate_pid(pid):
+            self._polybar_pid = pid
 
     @classmethod
     def tail(cls, polybar_pid: int, cache_path=None) -> str:
@@ -427,15 +463,7 @@ class Controller(object):
         try:
             event = EventListener.start()
             while True:
-                if self._polybar_pid == 0:
-                    # default behaviour
-                    print(o.get_output())
-                else:
-                    # non-zero pid; write to polybar cache and notify
-                    with open(self._polybar_cache, "w+") as f:
-                        print(o.get_output(), file=f)
-                    self.polybar_hook_notify(self.HOOK_TAIL_ID)
-
+                self._redirect_output(o.get_output())
                 next(event)
         except (EOFError, KeyboardInterrupt):
             pass
@@ -451,7 +479,6 @@ def main(*args, **kwargs):
     parser.add_argument("cache", type=pathlib.Path, action="store", nargs='?')
     parser.add_argument(*["--start", "-s"], action="store_true")
     parser.add_argument(*["--tail", "-t"], action="store_true")
-
     setup_config = parser.parse_args(args)
 
     if setup_config.tail:
