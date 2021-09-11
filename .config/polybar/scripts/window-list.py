@@ -262,7 +262,8 @@ class WindowInfoFormatter(object):
 
 
 class WindowListInteractor(object):
-    """Post-processing class for queried nodes and window information.
+    """Post-processing class for queried nodes and window information. Produces
+    the final output line that the polybar module is to receive.
 
     :param repo: Repository of current state of nodes in reference desktop
     :param formatter: Formatter for generating the ouput for polybar module
