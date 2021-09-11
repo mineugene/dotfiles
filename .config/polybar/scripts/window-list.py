@@ -416,7 +416,7 @@ class Controller(object):
 
     @polybar_pid.setter
     def polybar_pid(self, pid: int):
-        if self.validate_pid(pid):
+        if self.validate_polybar_pid(pid):
             self._polybar_pid = pid
 
     @classmethod
