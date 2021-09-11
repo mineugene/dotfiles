@@ -182,19 +182,25 @@ class WindowListRepo(object):
         self._d_node = node_driver
         self._d_wminfo = wminfo_driver
 
-    def get_window_list(self) -> list:
+    def get_window_list(self, filter=None) -> list:
         """Gets a list of windows and its properties, matching the description
         from :class:`Node`
 
+        :param filter: nodes to filter out from final result
         :return: List of nodes and their window properties
         """
         node_win_id = self._d_node.query_active_windows()
         wminfo_hash = self._d_wminfo.get_info_map()
 
+        if filter is not None:
+            [wminfo_hash.pop(id, None) for id in filter]
+
         result = []
         if not node_win_id or node_win_id[-1] == 0:
             return result
         for id in node_win_id:
+            if id not in wminfo_hash:
+                continue
             node = Node(id=id, **wminfo_hash[id])
             result.append(node.attrs)
         return result
@@ -217,7 +223,8 @@ class WindowInfoFormatter(object):
     """Window title formatter by string interpolation for polybar module.
     """
     # window label size
-    LABEL_SIZE = 20  # required - greater than or equal to len(OVERFLOW)+1
+    LABEL_SIZE = 17  # must be greater than or equal to len(OVERFLOW)+1
+    LABEL_SIZE_FOCUSED = 32
     # colour formatting (format: #[AA]RRGGBB)
     FG_DIMMED = "#8389a3"
     BG_FOCUSED = "#33374c"
@@ -231,15 +238,15 @@ class WindowInfoFormatter(object):
     def _set_foreground_color(self, title, color):
         return f"%{{F{color}}}{title}%{{F-}}"
 
-    def _clamp_interpolated_title(self, title):
+    def _clamp_interpolated_title(self, title, limit):
         """Returns a window title with a fixed length of LABEL_SIZE
 
         :param title: A window title
         :return: Title of fixed length
         """
-        title = title.ljust(self.LABEL_SIZE, " ")
-        if len(title) > self.LABEL_SIZE:
-            cut_index = self.LABEL_SIZE - len(self.OVERFLOW)
+        title = title.ljust(limit, " ")
+        if len(title) > limit:
+            cut_index = limit - len(self.OVERFLOW)
             title = title[:cut_index] + self.OVERFLOW
         return f" {title} "
 
@@ -247,7 +254,7 @@ class WindowInfoFormatter(object):
         """Returns a stylized window title for a focused node
         :param title: A window title
         """
-        title = self._clamp_interpolated_title(title)
+        title = self._clamp_interpolated_title(title, self.LABEL_SIZE_FOCUSED)
         title = self._set_background_color(title, self.BG_FOCUSED)
         title = self._set_foreground_color(title, self.FG_FOCUSED)
         return title
@@ -256,7 +263,7 @@ class WindowInfoFormatter(object):
         """Returns a stylized window title for an unfocused/inactive node
         :param title: A window title
         """
-        title = self._clamp_interpolated_title(title)
+        title = self._clamp_interpolated_title(title, self.LABEL_SIZE)
         title = self._set_foreground_color(title, self.FG_DIMMED)
         return title
 
@@ -276,16 +283,15 @@ class WindowListInteractor(object):
         self._formatter = formatter
 
     def get_output(self):
-        node_list = self._repo.get_window_list()
         node_focused = self._repo.get_focused_window()
+        node_focused_id = node_focused["id"]
+        node_list = self._repo.get_window_list([node_focused_id])
 
-        result = ""
+        result = node_focused["class"] + " - " + node_focused["title"]
+        result = self._formatter.style_focused(result)
         for n in node_list:
             title = n["title"]
-            if n["id"] == node_focused["id"]:
-                title = self._formatter.style_focused(title)
-            else:
-                title = self._formatter.style_inactive(title)
+            title = self._formatter.style_inactive(title)
             result = result + title
         return result
 
