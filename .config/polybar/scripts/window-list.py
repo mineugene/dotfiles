@@ -284,11 +284,14 @@ class WindowListInteractor(object):
 
     def get_output(self):
         node_focused = self._repo.get_focused_window()
-        node_focused_id = node_focused["id"]
-        node_list = self._repo.get_window_list([node_focused_id])
+        node_focused_id = node_focused.get("id", None)
+        filter = [node_focused_id] if node_focused_id else []
+        node_list = self._repo.get_window_list(filter)
 
-        result = node_focused["class"] + " - " + node_focused["title"]
-        result = self._formatter.style_focused(result)
+        result = ""
+        if node_focused_id:
+            result = node_focused["class"] + " - " + node_focused["title"]
+            result = self._formatter.style_focused(result)
         for n in node_list:
             title = n["title"]
             title = self._formatter.style_inactive(title)
