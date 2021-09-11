@@ -291,6 +291,18 @@ class WindowListInteractor(object):
 
 
 class ThreadedRefresh(threading.Thread):
+    """A thread to be started while waiting for the next input/event.
+    Runs the given target at equal intervals until thread is stopped.
+    The returned object may be printed to stdout, or redirected with a
+    custom printer.
+
+    :effects: Writes to stdout, or redirected output through custom printer
+    :param interval: Time in miliseconds between calls to target
+    :param target: Function to invoke
+    :param start_delay: Delay before the first invocation of target
+    :param timeout: Time in miliseconds for thread to expire
+    :param printer: Writer for return object of target
+    """
 
     def __init__(
         self,
@@ -312,6 +324,10 @@ class ThreadedRefresh(threading.Thread):
         self._terminate = threading.Event()
 
     def run(self):
+        """Method representing the thread's activity.
+        Invokes the callable object passed to the object's constructor as the
+        target argument.
+        """
         try:
             iter_count = 0
             self._terminate.wait(self.start_delay / 1000)
@@ -325,6 +341,9 @@ class ThreadedRefresh(threading.Thread):
             del self._target
 
     def stop(self):
+        """Sets flag to terminate all activity. Waits on printer and target to
+        finish before termination.
+        """
         self._terminate.set()
 
     @property
