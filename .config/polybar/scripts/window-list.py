@@ -7,6 +7,7 @@ import signal
 import stat
 import subprocess
 import sys
+import threading
 import typing
 
 
@@ -288,6 +289,48 @@ class WindowListInteractor(object):
         return result
 
 
+class ThreadedRefresh(threading.Thread):
+
+    def __init__(
+        self,
+        interval: int,
+        target,
+        *,
+        start_delay=1000,
+        timeout=6e5,
+        printer=print
+    ):
+        super().__init__(target=target)
+
+        self.interval = interval
+        self.start_delay = start_delay
+        self.timeout = timeout
+        self.printer = printer
+
+        self._target = target
+        self._terminate = threading.Event()
+
+    def run(self):
+        try:
+            iter_count = 0
+            self._terminate.wait(self.start_delay / 1000)
+            while not self.stopped:
+                self.printer(self._target())
+                self._terminate.wait(self.interval / 1000)
+                if self.interval * iter_count > self.timeout:
+                    self.stop()
+                iter_count += 1
+        finally:
+            del self._target
+
+    def stop(self):
+        self._terminate.set()
+
+    @property
+    def stopped(self) -> bool:
+        return self._terminate.is_set()
+
+
 class Controller(object):
     """A class to control communication with polybar.
 
@@ -460,17 +503,27 @@ class Controller(object):
         formatter = WindowInfoFormatter()
 
         o = WindowListInteractor(repo, formatter)
+        t: ThreadedRefresh = None
         try:
             event = EventListener.start()
             while True:
                 self._redirect_output(o.get_output())
+                t = ThreadedRefresh(
+                    500, o.get_output, printer=self._redirect_output
+                )
+                t.start()
                 next(event)
+                t.stop()
         except (EOFError, KeyboardInterrupt):
             pass
         except Exception:
             # in case of unhandled exception, notify last time before exit
             self.polybar_hook_notify(self.HOOK_TAIL_ID)
             raise
+        finally:
+            # stop remaining threads
+            if hasattr(t, "stop"):
+                t.stop()
 
 
 def main(*args, **kwargs):
