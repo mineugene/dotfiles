@@ -228,6 +228,8 @@ class WindowInfoFormatter(object):
     FG_DIMMED = "#8389a3"
     BG_FOCUSED = "#2f506b"
     FG_FOCUSED = "#e8e9ec"
+    BG_SAME_CLASS = "#9eaab8"
+    FG_SAME_CLASS = "#e8e9ec"
     # suffix for window labels when its length exceeds LABEL_SIZE
     OVERFLOW = ".."
 
@@ -271,6 +273,16 @@ class WindowInfoFormatter(object):
         title = self._set_foreground_color(title, self.FG_DIMMED)
         return title
 
+    def style_same_class(self, title):
+        """Returns a stylized window title for a node with the same class as
+        the focused node
+        :param title: A window title
+        """
+        title = self._clamp_interpolated_title(title, self.LABEL_SIZE)
+        title = self._set_background_color(title, self.BG_SAME_CLASS)
+        title = self._set_foreground_color(title, self.FG_SAME_CLASS)
+        return title
+
 
 class WindowListInteractor(object):
     """Post-processing class for queried nodes and window information. Produces
@@ -298,7 +310,10 @@ class WindowListInteractor(object):
             result = self._formatter.style_focused(result)
         for n in node_list:
             title = n["title"]
-            title = self._formatter.style_inactive(title)
+            if n["class"] == node_focused["class"]:
+                title = self._formatter.style_same_class(title)
+            else:
+                title = self._formatter.style_inactive(title)
             result = result + title
         return result
 
