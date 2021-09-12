@@ -233,13 +233,13 @@ class WindowInfoFormatter(object):
     # suffix for window labels when its length exceeds LABEL_SIZE
     OVERFLOW = ".."
 
-    def _set_background_color(self, title, color):
+    def _set_bg_color(self, title: str, color: str) -> str:
         return f"%{{B{color}}}{title}%{{B-}}"
 
-    def _set_foreground_color(self, title, color):
+    def _set_fg_color(self, title: str, color: str) -> str:
         return f"%{{F{color}}}{title}%{{F-}}"
 
-    def _clamp_interpolated_title(self, title, limit):
+    def _clamp_title(self, title: str, limit: int) -> str:
         """Returns a window title with a fixed length of LABEL_SIZE
 
         :param title: A window title
@@ -251,36 +251,36 @@ class WindowInfoFormatter(object):
             title = title[:cut_index] + self.OVERFLOW
         return f" {title} "
 
-    def style_focused(self, title):
+    def style_focused(self, title: str) -> str:
         """Returns a stylized window title for a focused node
         :param title: A window title
         """
-        title = self._clamp_interpolated_title(title, self.LABEL_SIZE_FOCUSED)
+        title = self._clamp_title(title, self.LABEL_SIZE_FOCUSED)
         delim, delim_pattern = " - ", r"^[ -]*"
         cls, name = title.split(delim, 1)
-        title = self._set_foreground_color(cls + delim, self.FG_DIMMED)
-        title += self._set_foreground_color(
+        title = self._set_fg_color(cls + delim, self.FG_DIMMED)
+        title += self._set_fg_color(
             re.sub(delim_pattern, "", name), self.FG_FOCUSED
         )
-        title = self._set_background_color(title, self.BG_FOCUSED)
+        title = self._set_bg_color(title, self.BG_FOCUSED)
         return title
 
-    def style_inactive(self, title):
+    def style_inactive(self, title: str) -> str:
         """Returns a stylized window title for an unfocused/inactive node
         :param title: A window title
         """
-        title = self._clamp_interpolated_title(title, self.LABEL_SIZE)
-        title = self._set_foreground_color(title, self.FG_DIMMED)
+        title = self._clamp_title(title, self.LABEL_SIZE)
+        title = self._set_fg_color(title, self.FG_DIMMED)
         return title
 
-    def style_same_class(self, title):
+    def style_same_class(self, title: str) -> str:
         """Returns a stylized window title for a node with the same class as
         the focused node
         :param title: A window title
         """
-        title = self._clamp_interpolated_title(title, self.LABEL_SIZE)
-        title = self._set_background_color(title, self.BG_SAME_CLASS)
-        title = self._set_foreground_color(title, self.FG_SAME_CLASS)
+        title = self._clamp_title(title, self.LABEL_SIZE)
+        title = self._set_bg_color(title, self.BG_SAME_CLASS)
+        title = self._set_fg_color(title, self.FG_SAME_CLASS)
         return title
 
 
