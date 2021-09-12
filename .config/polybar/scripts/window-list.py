@@ -227,7 +227,7 @@ class WindowInfoFormatter(object):
     LABEL_SIZE_FOCUSED = 32
     # colour formatting (format: #[AA]RRGGBB)
     FG_DIMMED = "#8389a3"
-    BG_FOCUSED = "#33374c"
+    BG_FOCUSED = "#2f506b"
     FG_FOCUSED = "#e8e9ec"
     # suffix for window labels when its length exceeds LABEL_SIZE
     OVERFLOW = ".."
