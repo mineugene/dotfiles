@@ -3,6 +3,7 @@
 import argparse
 import os
 import pathlib
+import re
 import signal
 import stat
 import subprocess
@@ -255,8 +256,13 @@ class WindowInfoFormatter(object):
         :param title: A window title
         """
         title = self._clamp_interpolated_title(title, self.LABEL_SIZE_FOCUSED)
+        delim, delim_pattern = " - ", r"^[ -]*"
+        cls, name = title.split(delim, 1)
+        title = self._set_foreground_color(cls + delim, self.FG_DIMMED)
+        title += self._set_foreground_color(
+            re.sub(delim_pattern, "", name), self.FG_FOCUSED
+        )
         title = self._set_background_color(title, self.BG_FOCUSED)
-        title = self._set_foreground_color(title, self.FG_FOCUSED)
         return title
 
     def style_inactive(self, title):
