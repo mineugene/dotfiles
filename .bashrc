@@ -33,7 +33,7 @@ PATH="$PATH:$PYENV_ROOT/bin"
 # [[ TERM WINDOW-CUSTOM TITLE ]]
 case "$TERM" in
     rxvt*)
-        PROMPT_COMMAND='echo -ne "\033]0;$(pwd)\007"' ;;
+        PROMPT_COMMAND='echo -ne "\033]0;$HOSTNAME:${PWD##*/}\007"' ;;
     *) ;;
 esac
 
