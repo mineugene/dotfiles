@@ -223,7 +223,7 @@ class WindowInfoFormatter(object):
     """
     # window label size
     LABEL_SIZE = 17  # must be greater than or equal to len(OVERFLOW)+1
-    LABEL_SIZE_FOCUSED = 32
+    LABEL_SIZE_FOCUSED = 27
     # colour formatting (format: #[AA]RRGGBB)
     FG_DIMMED = "#8389a3"
     BG_FOCUSED = "#2f506b"
