@@ -137,10 +137,8 @@ class WindowInfoDriver(object):
         """
         if line == "":
             return {}
-        # filter out redundant whitespace special characters
-        wminfo = " ".join(line.split()).encode("ascii", errors="ignore")
-        # parse columns
-        wminfo = wminfo.decode().split(" ", 9)
+        # filter out redundant whitespace and parse columns
+        wminfo = " ".join(line.split()).split(" ", 9)
         return {
             "id": int(wminfo[0], 0),
             "desktop": int(wminfo[1]),
