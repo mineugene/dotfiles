@@ -85,6 +85,7 @@ class NodeDriver(object):
     QUERIES = {
         "focused": "bspc query -N -n focused.window".split(),
         "local": "bspc query -N -n .local.window".split(),
+        "same_class": "bspc query -N -n .local.same_class".split(),
     }
 
     def _safe_hex_to_dec(self, node_id: str) -> int:
@@ -132,11 +133,17 @@ class NodeDriver(object):
     def query_local_windows(self) -> typing.Iterable[int]:
         """Queries a list of nodes in the reference desktop that contain an
         attached window
-
         :return: List of node id in reference desktop
         """
         node_win_id = self._select("local")
         return node_win_id
+
+    def query_local_class(self) -> typing.Iterable[int]:
+        """Queries a list of nodes with the same window class
+        :return: List of node id with the same class as the reference window
+        """
+        node_cls_id = self._select("same_class")
+        return node_cls_id
 
 
 class WindowInfoDriver(object):
