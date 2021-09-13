@@ -82,46 +82,60 @@ class EventListener(object):
 class NodeDriver(object):
     """Queries the state of bspwm nodes using 'bspc query'.
     """
+    QUERIES = {
+        "focused": "bspc query -N -n focused.window".split(),
+        "local": "bspc query -N -n .local.window".split(),
+    }
 
-    def _map_hex_id(self, node_id: str) -> int:
+    def _safe_hex_to_dec(self, node_id: str) -> int:
         """A query output is typically in hex (0x..) format; therefore,
         it is mapped into int for ease of comparison
 
-        :param node_id: The id number of node in base-16 str
-        :return: Node id in base-10 int
+        :param node_id: The id number of node in base-16
+        :return: Node id in base-10
         """
-        if node_id == "":
-            return 0
-        return int(node_id, 16)
+        id = 0
+        try:
+            id = int(node_id, 16)
+        except ValueError:
+            pass
+        return id
 
-    def _map_node_query(self, output: list) -> list:
-        """Maps the lines of hex node id from a query
+    def _select(self, query_id: str) -> typing.Iterable[int]:
+        """A general querying method that returns a formatted list from the
+        resulting raw output
+
+        :param query_id: An id from this class' QUERIES dictionary
+        :return: List of node id
+        """
+        cmd = self.QUERIES.get(query_id)
+        pipe = subprocess.run(cmd, capture_output=True, text=True)
+        return self._select_map(pipe.stdout.rstrip().split("\n"))
+
+    def _select_map(self, output: list) -> typing.Iterable[int]:
+        """Maps the given lines of node id from a query into a list of integers
 
         :param output: Lines from query output
-        :return: List of node id in base-10 integer
+        :return: List of node id
         """
-        return list(map(self._map_hex_id, output))
+        return list(
+            filter(lambda n: n != 0, map(self._safe_hex_to_dec, output))
+        )
 
     def query_focused(self) -> int:
         """Queries the currently focused node id in base-10
         :return: Focused node id in base-10 integer
         """
-        cmd = "bspc query -N -n focused.window".split()
-        pipe = subprocess.run(cmd, capture_output=True, text=True)
-        node_focused_id = self._map_node_query(
-            pipe.stdout.rstrip().split("\n")
-        )
+        node_focused_id = self._select("focused")
         return node_focused_id.pop()
 
-    def query_active_windows(self) -> list:
+    def query_local_windows(self) -> list:
         """Queries a list of nodes in the reference desktop that contain an
         attached window
 
         :return: List of node id in reference desktop in base-10 integer
         """
-        cmd = "bspc query -N -n .local.window".split()
-        pipe = subprocess.run(cmd, capture_output=True, text=True)
-        node_win_id = self._map_node_query(pipe.stdout.rstrip().split("\n"))
+        node_win_id = self._select("local")
         return node_win_id
 
 
@@ -188,7 +202,7 @@ class WindowListRepo(object):
         :param filter: nodes to filter out from final result
         :return: List of nodes and their window properties
         """
-        node_win_id = self._d_node.query_active_windows()
+        node_win_id = self._d_node.query_local_windows()
         wminfo_hash = self._d_wminfo.get_info_map()
 
         if filter is not None:
