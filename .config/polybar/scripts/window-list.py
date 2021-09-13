@@ -229,20 +229,6 @@ class WindowListRepo(object):
     def _group(self, winlist: typing.Iterable[dict], group="class") -> list:
         return sorted(winlist, key=lambda i: i.get(group, ""))
 
-    def get_window_list(self, filter=None) -> list:
-        """Gets a list of windows and its properties, matching the description
-        from :class:`Node`
-
-        :param filter: nodes to filter out from final result
-        :return: List of nodes and their window properties
-        """
-        node_win_id = self._d_node.query_local_windows()
-        wminfo_hash = self._d_wminfo.get_info_map()
-
-        self._filter(wminfo_hash, filter)
-        result = self._group(self._map_to_domain(node_win_id, wminfo_hash))
-        return result
-
     def get_focused_window(self) -> dict:
         """Gets the window properties of the currently focused window. The dict
         keys match the description from :class:`Node`
@@ -267,6 +253,20 @@ class WindowListRepo(object):
         wminfo_hash = self._d_wminfo.get_info_map()
 
         result = list(self._map_to_domain(node_cls_id, wminfo_hash))
+        return result
+
+    def get_window_list(self, filter=None) -> list:
+        """Gets a list of windows and its properties, matching the description
+        from :class:`Node`
+
+        :param filter: nodes to filter out from final result
+        :return: List of nodes and their window properties
+        """
+        node_win_id = self._d_node.query_local_windows()
+        wminfo_hash = self._d_wminfo.get_info_map()
+
+        self._filter(wminfo_hash, filter)
+        result = self._group(self._map_to_domain(node_win_id, wminfo_hash))
         return result
 
 
