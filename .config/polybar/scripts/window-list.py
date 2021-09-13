@@ -18,7 +18,7 @@ class Node(object):
     """
 
     def __init__(self, **kwargs):
-        """Contructor method
+        """Constructor method
         """
         self.id = kwargs.get("id")
         self.desktop_id = kwargs.get("desktop")
