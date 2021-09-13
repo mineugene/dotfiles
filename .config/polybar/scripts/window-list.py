@@ -106,7 +106,7 @@ class NodeDriver(object):
         """Queries the currently focused node id in base-10
         :return: Focused node id in base-10 integer
         """
-        cmd = "bspc query -N -n focused".split()
+        cmd = "bspc query -N -n focused.window".split()
         pipe = subprocess.run(cmd, capture_output=True, text=True)
         node_focused_id = self._map_node_query(
             pipe.stdout.rstrip().split("\n")
