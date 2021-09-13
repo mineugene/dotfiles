@@ -122,18 +122,18 @@ class NodeDriver(object):
             filter(lambda n: n != 0, map(self._safe_hex_to_dec, output))
         )
 
-    def query_focused(self) -> int:
+    def query_focused(self) -> typing.Iterable[int]:
         """Queries the currently focused node id in base-10
-        :return: Focused node id in base-10 integer
+        :return: Focused node id
         """
         node_focused_id = self._select("focused")
         return node_focused_id.pop()
 
-    def query_local_windows(self) -> list:
+    def query_local_windows(self) -> typing.Iterable[int]:
         """Queries a list of nodes in the reference desktop that contain an
         attached window
 
-        :return: List of node id in reference desktop in base-10 integer
+        :return: List of node id in reference desktop
         """
         node_win_id = self._select("local")
         return node_win_id
