@@ -243,7 +243,7 @@ class WindowListRepo(object):
             return {}
         return result.pop()
 
-    def get_same_class_windows(self) -> list:
+    def get_same_class_windows(self, filter=None) -> list:
         """Gets a list of windows and its properties that are in the same class
         as the reference window. They match the description from :class:`Node`
 
@@ -252,6 +252,7 @@ class WindowListRepo(object):
         node_cls_id = self._d_node.query_local_class()
         wminfo_hash = self._d_wminfo.get_info_map()
 
+        self._filter(wminfo_hash, filter)
         result = list(self._map_to_domain(node_cls_id, wminfo_hash))
         return result
 
@@ -354,19 +355,21 @@ class WindowListInteractor(object):
         node_focused = self._repo.get_focused_window()
         node_focused_id = node_focused.get("id", None)
         filter = [node_focused_id] if node_focused_id else []
+
+        node_cls_list = self._repo.get_same_class_windows(filter)
+        if node_focused_id:
+            filter += map(lambda n: n.get("id", 0), node_cls_list)
+
         node_list = self._repo.get_window_list(filter)
 
         result = ""
         if node_focused_id:
-            result = node_focused["class"] + " - " + node_focused["title"]
-            result = self._formatter.style_focused(result)
+            title = node_focused["class"] + " - " + node_focused["title"]
+            result += self._formatter.style_focused(title)
+        for n in node_cls_list:
+            result += self._formatter.style_same_class(n["title"])
         for n in node_list:
-            title = n["title"]
-            if n["class"] == node_focused["class"]:
-                title = self._formatter.style_same_class(title)
-            else:
-                title = self._formatter.style_inactive(title)
-            result = result + title
+            result += self._formatter.style_inactive(n["title"])
         return result
 
 
