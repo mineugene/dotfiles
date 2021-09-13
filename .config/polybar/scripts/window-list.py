@@ -127,7 +127,7 @@ class NodeDriver(object):
         :return: Focused node id
         """
         node_focused_id = self._select("focused")
-        return node_focused_id.pop()
+        return node_focused_id
 
     def query_local_windows(self) -> typing.Iterable[int]:
         """Queries a list of nodes in the reference desktop that contain an
