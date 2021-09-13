@@ -257,6 +257,18 @@ class WindowListRepo(object):
             return {}
         return result.pop()
 
+    def get_same_class_windows(self) -> list:
+        """Gets a list of windows and its properties that are in the same class
+        as the reference window. They match the description from :class:`Node`
+
+        :return: List of nodes of the same class, and their window properties
+        """
+        node_cls_id = self._d_node.query_local_class()
+        wminfo_hash = self._d_wminfo.get_info_map()
+
+        result = list(self._map_to_domain(node_cls_id, wminfo_hash))
+        return result
+
 
 class WindowInfoFormatter(object):
     """Window title formatter by string interpolation for polybar module.
