@@ -209,6 +209,26 @@ class WindowListRepo(object):
         self._d_node = node_driver
         self._d_wminfo = wminfo_driver
 
+    def _map_to_domain(
+        self,
+        node_id: list,
+        wminfo_hash: dict,
+    ) -> typing.Iterator[dict]:
+        for id in node_id:
+            if id not in wminfo_hash:
+                continue
+            node = Node(id=id, **wminfo_hash[id])
+            yield node.attrs
+
+    def _filter(self, hash_map: dict, filter: list) -> list:
+        result = []
+        if filter is not None:
+            result = [hash_map.pop(id, None) for id in filter]
+        return result
+
+    def _group(self, winlist: typing.Iterable[dict], group="class") -> list:
+        return sorted(winlist, key=lambda i: i.get(group, ""))
+
     def get_window_list(self, filter=None) -> list:
         """Gets a list of windows and its properties, matching the description
         from :class:`Node`
@@ -219,17 +239,8 @@ class WindowListRepo(object):
         node_win_id = self._d_node.query_local_windows()
         wminfo_hash = self._d_wminfo.get_info_map()
 
-        if filter is not None:
-            [wminfo_hash.pop(id, None) for id in filter]
-
-        result = []
-        if not node_win_id or node_win_id[-1] == 0:
-            return result
-        for id in node_win_id:
-            if id not in wminfo_hash:
-                continue
-            node = Node(id=id, **wminfo_hash[id])
-            result.append(node.attrs)
+        self._filter(wminfo_hash, filter)
+        result = self._group(self._map_to_domain(node_win_id, wminfo_hash))
         return result
 
     def get_focused_window(self) -> dict:
@@ -241,9 +252,10 @@ class WindowListRepo(object):
         node_focused = self._d_node.query_focused()
         wminfo_hash = self._d_wminfo.get_info_map()
 
-        if node_focused == 0:
+        result = list(self._map_to_domain(node_focused, wminfo_hash))
+        if len(result) == 0:
             return {}
-        return Node(id=node_focused, **wminfo_hash[node_focused]).attrs
+        return result.pop()
 
 
 class WindowInfoFormatter(object):
