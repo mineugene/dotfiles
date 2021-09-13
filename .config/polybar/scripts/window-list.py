@@ -151,38 +151,45 @@ class WindowInfoDriver(object):
     """
 
     def _map_wmctrl_line(self, line: str) -> dict:
-        """Maps lines from 'wmctrl' into a dictionary of each column
+        """Maps lines from 'wmctrl' into a dictionary of each column:
+
+        col header
+        --- ------
+        0   window id
+        1   desktop id
+        2   pid
+        3-6 geometry (x-offset, y-offset, width, height)
+        7   class name
+        8   hostname
+        9   window title
 
         :param line: A line from 'wmctrl' list output
         :return: Hashed column names with its values
         """
-        if line == "":
-            return {}
         # filter out redundant whitespace and parse columns
         wminfo = " ".join(line.split()).split(" ", 9)
         return {
             "id": int(wminfo[0], 0),
             "desktop": int(wminfo[1]),
             "pid": int(wminfo[2]),
-            "geometry": list(map(int, wminfo[3:7])),
+            "geometry": tuple(map(int, wminfo[3:7])),
             "class": wminfo[7].split(".")[-1].lower(),
-            # filter out non-alphanumeric characters
-            "title": " ".join(wminfo[9].split())
+            "title": wminfo[9]
         }
 
     def get_info_map(self) -> dict:
-        """Retrieves info from all windows
-        :return: Hashed window ids with its properties
+        """Retrieves info of all windows in every desktop
+        :return: Hashed window ids with its property values
         """
         cmd = "wmctrl -pGxl".split()
         pipe = subprocess.run(cmd, capture_output=True, text=True)
+        out = pipe.stdout.rstrip().split("\n")
 
         result = {}
-        for line in pipe.stdout.rstrip().split("\n"):
+        for line in filter(lambda n: n != "", out):
             tokenized_line = self._map_wmctrl_line(line)
-            if "id" not in tokenized_line:
-                continue
             id = tokenized_line.pop("id", 0)  # extract window id
+
             result[id] = tokenized_line  # key: window id, value: props
         return result
 
