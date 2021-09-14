@@ -315,12 +315,30 @@ class WindowInfoFormatter(object):
     OVERFLOW = ".."
     # separator between class name and window title for the focused label
     DELIM_FOCUSED = " - "
+    # surrounding character for window titles
+    # if paren, bracket, brace, then must be open type
+    SURROUND_CHAR = "["
+    # left-right padding for window title
+    PADDING = 1
 
     def _set_bg_color(self, title: str, color: str) -> str:
         return f"%{{B{color}}}{title}%{{B-}}"
 
     def _set_fg_color(self, title: str, color: str) -> str:
         return f"%{{F{color}}}{title}%{{F-}}"
+
+    def _set_surround(self, title: str) -> str:
+        open = self.SURROUND_CHAR
+        close = {
+            "[": "]",
+            "{": "}",
+            "(": ")",
+        }.get(self.SURROUND_CHAR, self.SURROUND_CHAR)
+        return open + title + close
+
+    def _set_padding(self, title: str) -> str:
+        pad = " " * self.PADDING
+        return pad + title + pad
 
     def _clamp_title(self, title: str, limit: int) -> str:
         """Returns a window title with a fixed length of LABEL_SIZE
@@ -332,7 +350,7 @@ class WindowInfoFormatter(object):
         if len(title) > limit:
             cut_index = limit - len(self.OVERFLOW)
             title = title[:cut_index] + self.OVERFLOW
-        return f" {title} "
+        return title
 
     def _strip_focused_delim(
         self, pattern: typing.Pattern[str], label: str
@@ -349,20 +367,22 @@ class WindowInfoFormatter(object):
         """Returns a stylized window title for a focused node
         :param title: A window title
         """
-        title = self._strip_focused_delim(r"^[ -]*", title)
-        title = self._clamp_title(title, self.LABEL_SIZE_FOCUSED)
+        label = self._strip_focused_delim(r"^.*- +", title)
+        label = self._clamp_title(label, self.LABEL_SIZE_FOCUSED)
 
-        cls, name = title.split(self.DELIM_FOCUSED, 1)
-        title = self._set_fg_color(cls + self.DELIM_FOCUSED, self.FG_DIMMED) \
-            + self._set_fg_color(name, self.FG_FOCUSED)
-        title = self._set_bg_color(title, self.BG_FOCUSED)
-        return title
+        cls, name = label.split(self.DELIM_FOCUSED, 1)
+        label = self._set_fg_color(cls + self.DELIM_FOCUSED, self.FG_DIMMED) \
+            + self._set_fg_color(self._set_surround(name), self.FG_FOCUSED)
+        label = self._set_padding(label)
+        label = self._set_bg_color(label, self.BG_FOCUSED)
+        return label
 
     def style_inactive(self, title: str) -> str:
         """Returns a stylized window title for an unfocused/inactive node
         :param title: A window title
         """
-        title = self._clamp_title(title, self.LABEL_SIZE)
+        title = self._set_surround(self._clamp_title(title, self.LABEL_SIZE))
+        title = self._set_padding(title)
         title = self._set_fg_color(title, self.FG_DIMMED)
         return title
 
@@ -371,7 +391,8 @@ class WindowInfoFormatter(object):
         the focused node
         :param title: A window title
         """
-        title = self._clamp_title(title, self.LABEL_SIZE)
+        title = self._set_surround(self._clamp_title(title, self.LABEL_SIZE))
+        title = self._set_padding(title)
         title = self._set_bg_color(title, self.BG_SAME_CLASS)
         title = self._set_fg_color(title, self.FG_SAME_CLASS)
         return title
