@@ -191,9 +191,11 @@ class WindowInfoDriver(object):
         :return: Hashed column names with its values
         """
         # filter out redundant whitespace special characters
-        wminfo = " ".join(line.split()).encode("ascii", errors="ignore")
+        wminfo = " ".join(
+            line.encode("ascii", errors="ignore").decode().split()
+        )
         # parse columns
-        wminfo = wminfo.decode().split(" ", 9)
+        wminfo = wminfo.split(" ", 9)
         return {
             "id": int(wminfo[0], 0),
             "desktop": int(wminfo[1]),
