@@ -86,6 +86,7 @@ class NodeDriver(object):
         "focused": "bspc query -N -n focused.window".split(),
         "local": "bspc query -N -n .local.window".split(),
         "same_class": "bspc query -N -n .local.same_class".split(),
+        "flags": "bspc wm --get-status".split(),
     }
 
     def _safe_hex_to_dec(self, node_id: str) -> int:
@@ -111,9 +112,9 @@ class NodeDriver(object):
         """
         cmd = self.QUERIES.get(query_id)
         pipe = subprocess.run(cmd, capture_output=True, text=True)
-        return self._select_map(pipe.stdout.rstrip().split("\n"))
+        return pipe.stdout.rstrip().split("\n")
 
-    def _select_map(self, output: list) -> typing.Iterable[int]:
+    def _id_map(self, output: list) -> typing.Iterable[int]:
         """Maps the given lines of node id from a query into a list of integers
 
         :param output: Lines from query output
@@ -123,11 +124,27 @@ class NodeDriver(object):
             filter(lambda n: n != 0, map(self._safe_hex_to_dec, output))
         )
 
+    def _report_map(self, status: str) -> dict:
+        """Maps the report line from probing the overall status
+
+        :param output: Full line from status report
+        :return: Hashed montior id and its state
+        """
+        result = {}
+        if status == "":
+            return result
+
+        report = re.split(r"[W:][Mm]", status)[1:]
+        for rep in report:
+            monitor, *state = rep.split(":")
+            result[monitor] = state
+        return result
+
     def query_focused(self) -> typing.Iterable[int]:
         """Queries the currently focused node id in base-10
         :return: Focused node id
         """
-        node_focused_id = self._select("focused")
+        node_focused_id = self._id_map(self._select("focused"))
         return node_focused_id
 
     def query_local_windows(self) -> typing.Iterable[int]:
@@ -135,15 +152,22 @@ class NodeDriver(object):
         attached window
         :return: List of node id in reference desktop
         """
-        node_win_id = self._select("local")
+        node_win_id = self._id_map(self._select("local"))
         return node_win_id
 
     def query_local_class(self) -> typing.Iterable[int]:
         """Queries a list of nodes with the same window class
         :return: List of node id with the same class as the reference window
         """
-        node_cls_id = self._select("same_class")
+        node_cls_id = self._id_map(self._select("same_class"))
         return node_cls_id
+
+    def report(self) -> dict:
+        """Returns a report of the current state of all monitors
+        :return: Hashed monitor id and its state
+        """
+        report = self._report_map(self._select("flags"))
+        return report
 
 
 class WindowInfoDriver(object):
