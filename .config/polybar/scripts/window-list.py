@@ -313,6 +313,7 @@ class WindowInfoFormatter(object):
     FG_SAME_CLASS = "#e8e9ec"
     # suffix for window labels when its length exceeds LABEL_SIZE
     OVERFLOW = ".."
+    DELIM_FOCUSED = " - "
 
     def _set_bg_color(self, title: str, color: str) -> str:
         return f"%{{B{color}}}{title}%{{B-}}"
@@ -332,17 +333,27 @@ class WindowInfoFormatter(object):
             title = title[:cut_index] + self.OVERFLOW
         return f" {title} "
 
+    def _strip_focused_delim(
+        self, pattern: typing.Pattern[str], label: str
+    ) -> str:
+        """Strip out the left substring of title that matches the given pattern
+        :param pattern: Substring to strip from title
+        :param title: A focused window label
+        """
+        cls, name = label.split(self.DELIM_FOCUSED, 1)
+        name = re.sub(pattern, "", name)
+        return cls + self.DELIM_FOCUSED + name
+
     def style_focused(self, title: str) -> str:
         """Returns a stylized window title for a focused node
         :param title: A window title
         """
+        title = self._strip_focused_delim(r"^[ -]*", title)
         title = self._clamp_title(title, self.LABEL_SIZE_FOCUSED)
-        delim, delim_pattern = " - ", r"^[ -]*"
-        cls, name = title.split(delim, 1)
-        title = self._set_fg_color(cls + delim, self.FG_DIMMED)
-        title += self._set_fg_color(
-            re.sub(delim_pattern, "", name), self.FG_FOCUSED
-        )
+
+        cls, name = title.split(self.DELIM_FOCUSED, 1)
+        title = self._set_fg_color(cls + self.DELIM_FOCUSED, self.FG_DIMMED) \
+            + self._set_fg_color(name, self.FG_FOCUSED)
         title = self._set_bg_color(title, self.BG_FOCUSED)
         return title
 
