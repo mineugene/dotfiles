@@ -313,6 +313,7 @@ class WindowInfoFormatter(object):
     FG_SAME_CLASS = "#e8e9ec"
     # suffix for window labels when its length exceeds LABEL_SIZE
     OVERFLOW = ".."
+    # separator between class name and window title for the focused label
     DELIM_FOCUSED = " - "
 
     def _set_bg_color(self, title: str, color: str) -> str:
