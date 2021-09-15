@@ -367,7 +367,7 @@ class WindowInfoFormatter(object):
         """Returns a stylized window title for a focused node
         :param title: A window title
         """
-        label = self._strip_focused_delim(r"^.*?- +", title)
+        label = self._strip_focused_delim(r"^[^\w]*?- +", title)
         label = self._clamp_title(label, self.LABEL_SIZE_FOCUSED)
 
         cls, name = label.split(self.DELIM_FOCUSED, 1)
