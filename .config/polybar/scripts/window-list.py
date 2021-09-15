@@ -306,11 +306,12 @@ class WindowInfoFormatter(object):
     LABEL_SIZE = 17  # must be greater than or equal to len(OVERFLOW)+1
     LABEL_SIZE_FOCUSED = 27
     # colour formatting (format: #[AA]RRGGBB)
-    FG_DIMMED = "#8389a3"
-    BG_FOCUSED = "#2f506b"
-    FG_FOCUSED = "#e8e9ec"
-    BG_SAME_CLASS = "#9eaab8"
-    FG_SAME_CLASS = "#e8e9ec"
+    FG_DIMMED = "#6b7089"
+    BG_FOCUSED = "#1e2132"
+    FG_FOCUSED = "#c6c8d1"
+    FG_FOCUSED_CLS = "#6b7089"
+    BG_SAME_CLASS = "#5b7881"
+    FG_SAME_CLASS = "#d2d4de"
     # suffix for window labels when its length exceeds LABEL_SIZE
     OVERFLOW = ".."
     # separator between class name and window title for the focused label
@@ -371,8 +372,9 @@ class WindowInfoFormatter(object):
         label = self._clamp_title(label, self.LABEL_SIZE_FOCUSED)
 
         cls, name = label.split(self.DELIM_FOCUSED, 1)
-        label = self._set_fg_color(cls + self.DELIM_FOCUSED, self.FG_DIMMED) \
-            + self._set_fg_color(self._set_surround(name), self.FG_FOCUSED)
+        label = self._set_fg_color(
+            cls + self.DELIM_FOCUSED, self.FG_FOCUSED_CLS
+        ) + self._set_fg_color(self._set_surround(name), self.FG_FOCUSED)
         label = self._set_padding(label)
         label = self._set_bg_color(label, self.BG_FOCUSED)
         return label

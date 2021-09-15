@@ -10,10 +10,10 @@ type nm-applet && nm-applet --no-agent &
 bspc_config_global() {
     declare -A props=(
         # colours
-        ["normal_border_color"]="#9EAAB8"
-        ["active_border_color"]="#5C7A92"
-        ["focused_border_color"]="#2F506B"
-        ["presel_feedback_color"]="#2A2F32"
+        ["normal_border_color"]="#c6c8d1"
+        ["active_border_color"]="#444b71"
+        ["focused_border_color"]="#1e2132"
+        ["presel_feedback_color"]="#95c4ce"
         # spacing
         ["border_width"]=9
         ["window_gap"]=0

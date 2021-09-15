@@ -7,8 +7,8 @@
 
 # [[ PROMPT COLOUR ]]
 # 24b RGB-colour for prompt; foreground & background
-PS1_FG_COLOR="232;233;236"
-PS1_BG_COLOR="051;055;076"
+PS1_FG_COLOR="022;024;033"
+PS1_BG_COLOR="198;200;209"
 
 # escape codes for prompt colours
 PS1_CCODE_MAIN_FG="\x1b[38;2;${PS1_FG_COLOR}m"

@@ -1,5 +1,5 @@
 URxvt.loginShell: true
-URxvt.background: rgba:E800/E900/EC00/CCCC
+URxvt.background: rgba:1600/1800/2100/f5c1
 URxvt.cursorBlink: true
 URxvt.depth: 32
 URxvt.font: xft:iosevka-ss16-heavy:pixelsize=20,xft:DejaVuSansMono:pixelsize=16,xft:NanumMyeongjo:pixelsize=16
@@ -26,33 +26,42 @@ Xft.hintstyle: hintslight
 Xft.rgba: none
 
 ! color:special
-*.background:   #E8E9EC
-*.foreground:   #33374C
-*.cursorColor:  #33374C
+*.foreground:   #c6c8d1
+*.background:   #161821
+*.cursorColor:  #c6c8d1
+
 ! color:black
-*.color0:       #DCDFE7
-*.color8:       #8389A3
+*.color0:       #1e2132
+*.color8:       #6b7089
+
 ! color:red
-*.color1:       #CC517A
-*.color9:       #CC3768
+*.color1:       #e27878
+*.color9:       #e98989
+
 ! color:green
-*.color2:       #668E3D
-*.color10:      #598030
+*.color2:       #b4be82
+*.color10:      #c0ca8e
+
 ! color:yellow
-*.color3:       #C57339
-*.color11:      #B6662D
+*.color3:       #e2a478
+*.color11:      #e9b189
+
 ! color:blue
-*.color4:       #2D539E
-*.color12:      #22478E
+*.color4:       #84a0c6
+*.color12:      #91acd1
+
 ! color:magenta
-*.color5:       #7759B4
-*.color13:      #6845AD
+*.color5:       #a093c7
+*.color13:      #ada0d3
+
 ! color:cyan
-*.color6:       #3f83a6
-*.color14:      #327698
+*.color6:       #89b8c2
+*.color14:      #95c4ce
+
 ! color:white
-*.color7:       #33374c
-*.color15:      #262a3f
+*.color7:       #c6c8d1
+*.color15:      #d2d4de
+
 
 ! perl extensions
 URxvt.perl-lib: /usr/lib/urxvt/perl
