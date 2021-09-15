@@ -32,7 +32,7 @@ fi
 #   ./scripts/window-list.sh
 echo -n "Restarting window-list module..."
 if process_stop -f "polybar-winlist"; then
-    polybar-winlist --start "$polybar_id" &
+    polybar-winlist -s "$polybar_id" &>"$HOME/.cache/polybar/polybar.log" &
     echo "DONE"
 else
     echo -e "\n\t$0: failed to restart the window-list module"
