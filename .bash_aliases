@@ -44,7 +44,8 @@ ls_long_format() {
     list_pattern='
         /^d(...){3}/ {print "\033[0;94m" $0 "\033[0;39m"}
         /^l(...){3}/ {print "\033[5;96m" $0 "\033[0;39m"}
-        /^[^dl]/ {print $0}
+        /^-(..x)(...){2}/ {print "\033[0;92m" $0 "\033[0;39m"}
+        /^[^dl](..[^x])(...){2}/ {print $0}
     '
     pwd &&
     /usr/bin/ls "${default_args[@]}" "$@"| tail -fn +2 | awk "${list_pattern}"
