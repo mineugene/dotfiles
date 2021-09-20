@@ -59,6 +59,7 @@ class EventListener(object):
         "desktop_layout",
         "node_focus",
         "node_remove",
+        "node_transfer",
     ]
 
     @classmethod
