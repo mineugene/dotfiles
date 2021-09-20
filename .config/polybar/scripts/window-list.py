@@ -197,14 +197,19 @@ class WindowInfoDriver(object):
         )
         # parse columns
         wminfo = wminfo.split(" ", 9)
-        return {
+        wminfo_hash = {
             "id": int(wminfo[0], 0),
             "desktop": int(wminfo[1]),
             "pid": int(wminfo[2]),
             "geometry": tuple(map(int, wminfo[3:7])),
             "class": wminfo[7].split(".")[-1].lower(),
-            "title": wminfo[9]
         }
+        try:
+            wminfo_hash.update(title=wminfo[9])
+        except IndexError:
+            wminfo_hash.update(title=wminfo_hash["class"])
+        finally:
+            return wminfo_hash
 
     def get_info_map(self) -> dict:
         """Retrieves info of all windows in every desktop
