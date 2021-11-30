@@ -377,7 +377,14 @@ class WindowInfoFormatter(object):
         label = self._strip_focused_delim(r"^[^\w]*?- +", title)
         label = self._clamp_title(label, self.LABEL_SIZE_FOCUSED)
 
-        cls, name = label.split(self.DELIM_FOCUSED, 1)
+        cls = name = ""
+        try:
+            cls, name = label.split(self.DELIM_FOCUSED, 1)
+        except ValueError:
+            cls = "UNKNOWN"
+            name = "".ljust(
+                self.LABEL_SIZE_FOCUSED - len(self.DELIM_FOCUSED) - len(cls)
+            )
         label = self._set_fg_color(
             cls + self.DELIM_FOCUSED, self.FG_FOCUSED_CLS
         ) + self._set_fg_color(self._set_surround(name), self.FG_FOCUSED)
